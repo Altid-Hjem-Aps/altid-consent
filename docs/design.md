@@ -1,6 +1,6 @@
 # Unified consent block — design
 
-Status: design, awaiting approval. No package code yet.
+Status: approved. v1 implemented per docs/superpowers/plans/2026-09-24-altid-consent-v1.md, which corrects this document in the three places marked below.
 
 ## The model in one paragraph
 
@@ -58,18 +58,27 @@ organisation, from day one.
   no publish rights to manage. Public is safe: the sentences are already public
   on every site, and the token code signs with a key each site supplies at
   runtime.
-- **Two entry points.** `altid-consent` for the browser component and sentences;
-  `altid-consent/server` for the token and the confirmation-mail body. The token
-  code handles a secret and must never land in a client bundle.
+- **Two entry points.** `altid-consent` for the text, versions, state and event
+  names — no React, safe to import from server code and mails — and
+  `altid-consent/react` for the component. A server entry for the token comes
+  when the token moves in (below). *(Corrected in v1.)*
 
 ### What moves in
 
-| From each site | Today | In the package |
+| From each site | Today | In v1 |
 | --- | --- | --- |
-| `lib/consent-token.ts` | byte-identical on all three | lifts unchanged |
 | the consent block in `WaitlistForm` | three variants | one component |
 | consent sentences in `lib/copy.ts` | three variants | generated per brand |
-| consent body of `emails/consent-confirm.ts` | 10 lines differ | generated per brand |
+| `lib/consent-token.ts` | byte-identical on all three | not yet |
+| consent body of `emails/consent-confirm.ts` | 10 lines differ | not yet |
+
+*(Corrected in v1.)* The token cannot lift unchanged, as this document first
+claimed: it is named `mad` throughout — `ConsentSet = { mad, group }`, and the
+confirm form posts `value="mad"`. Lifting it would carry `mad` into the one place
+built to be free of it, or force every site to rename first. It moves in once a
+site speaks `own`/`group` end to end. The confirmation mail already gets its
+consent sentences from the package through each site's `lib/copy.ts`; only its
+headings stay site-owned for now.
 
 The signup route, `db.ts`, the preference centre and the database stay with each
 site. Those are site-shaped, not consent-shaped.
@@ -77,21 +86,25 @@ site. Those are site-shaped, not consent-shaped.
 ### What a site writes
 
 ```tsx
-<ConsentBlock brand="forsikring" />
+const [consentState, setConsentState] = useState(INITIAL_CONSENT)
+<ConsentBlock brand="forsikring" value={consentState} onChange={setConsentState} />
+// at submit: consentFlags(consentState) → { own, group }
 ```
 
-That is the entire configuration. The package owns everything brand-related:
-display names, the family list, the broad and narrow sentences, the opt-down
-link. "Hele familien" is every brand; "resten af familien" is every brand except
-the one the site is. When a brand is added to the family, it is added once, in
-the package, and appears on every site.
+The brand is the entire configuration. *(Corrected in v1: the site holds the
+state, because it needs it at submit.)*
 
-The component hands the site `{ own: boolean, group: boolean }`. The site's own
-`db.ts` maps that to its columns in two plain lines:
+The component hands the site `{ own: boolean, group: boolean }`. *(Corrected in v1:
+on altidforsikring.dk that mapping sits in the form's request body,
+`components/WaitlistForm.tsx`, not in `db.ts` — the site's API and database
+still call the own-brand flag `mad`.)*
 
 ```ts
-marketing_consent_mad:   consent.own,   // Forsikring's existing column name
-marketing_consent_group: consent.group,
+consent: {
+  version: CONSENT_VERSION,
+  mad:   consentFlags(consentState).own,   // Forsikring's existing column name
+  group: consentFlags(consentState).group,
+},
 ```
 
 The package never touches a database and never knows a column name. A config
@@ -157,9 +170,10 @@ change safe; it does not make it free. Altid Hjem decides when that is worth it.
 
 ### If a site ever renames its columns
 
-Not planned, and not needed: once the package is in, `mad` survives in exactly
-one line of Forsikring's `db.ts`. But if a team does rename later, the README
-says how:
+Not planned, and not needed. *(Corrected in v1: `mad` does not survive in one
+line — with the package in, it remains the own-brand flag throughout
+altidforsikring.dk's API, consent token, confirm page, preference centre and
+`db.ts`.)* But if a team does rename later, the README says how:
 
 - **Never a bare `ALTER TABLE ... RENAME COLUMN`.** The deployed code references
   the old name for as long as the deploy takes, and every write in that window

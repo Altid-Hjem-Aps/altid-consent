@@ -42,6 +42,10 @@ describe('consentSentences', () => {
       expect(s.own.includes(`Altid ${name}`) || s.group.includes(name)).toBe(true)
     }
     expect(s.group).not.toContain(BRAND_NAMES[brand])
+    for (const other of FAMILY) {
+      if (other === brand) continue
+      expect(s.own).not.toContain(BRAND_NAMES[other])
+    }
     expect(s.own).toContain('fra Altid Hjem')
     expect(s.group).toContain('fra Altid Hjem')
   })

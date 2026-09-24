@@ -8,6 +8,10 @@ Stored versions are `<template version>-<brand>`, e.g. `2026-09-24.1-forsikring`
 Versions from before this package (e.g. `2026-07-14.2-mad`, `2026-09-23.3-af`)
 were site-specific; their text lives in each site's git history.
 
+This version covers the package's own sentences only — the ones `consentSentences`
+generates. Text a site owns itself, such as its confirmation-mail headings, is not
+versioned here.
+
 ## 2026-09-24.1
 
 First template. Reproduces altidforsikring.dk's text exactly as it stood under

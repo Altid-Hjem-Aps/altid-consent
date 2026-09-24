@@ -6,6 +6,11 @@ A site says which brand it is. The sentences, the family of brands, the rules an
 the version live here. When consent changes, it changes here, and every site
 picks it up with a version bump.
 
+v1 covers the four family brands: `forsikring`, `energi`, `mobil`, `mad`.
+altidhjem.dk cannot adopt v1 yet — Altid Hjem is the parent and sender named in
+every sentence ("fra Altid Hjem"), not a family member, so what its own narrow
+sentence should say is Altid Hjem's decision to make first.
+
 - **Why it works this way:** [DECISIONS.md](DECISIONS.md)
 - **What every version said, word for word:** [CHANGELOG.md](CHANGELOG.md)
 - **The design behind it:** [docs/design.md](docs/design.md)
@@ -17,7 +22,11 @@ npm install "github:Altid-Hjem-Aps/altid-consent#v1.0.0"
 ```
 
 Installed by git tag, not from a registry: no tokens, no `.npmrc`. npm builds the
-package on install. React 19 is a peer dependency.
+package on install (the `prepare` script runs `npm run build`), so the machine
+installing it needs access to GitHub and must not disable lifecycle scripts
+(`--ignore-scripts`, or a package manager that blocks install scripts by
+default) — otherwise there is no `dist` and nothing to import. React 19 is a
+peer dependency.
 
 ## Use it
 
@@ -35,15 +44,29 @@ const version = consentVersion('mad')
 ```
 
 `brand` is one of `forsikring`, `energi`, `mobil`, `mad`. Your form holds the
-state because it needs it at submit. `dark` switches to the dark-background
-colours; `colors={{ accent: '#dcd799' }}` overrides what differs on your site
-(that one is Altid Mad's mint).
+state because it needs it at submit. The component's default colours are
+altidforsikring.dk's; `dark` switches to the dark-background colours, and
+`colors={{ accent: '#dcd799' }}` overrides what differs on your site (that one
+is Altid Mad's mint) — other sites override whichever colours differ from
+Forsikring's, not just accent.
 
 The component uses inline styles only. Tailwind does not scan `node_modules`, so
 utility classes in a package would silently not exist on your site.
 
 `altid-consent` has no React in it, so server code and mails can import the
 sentences from it directly.
+
+### Events
+
+```ts
+import { CONSENT_EVENTS } from 'altid-consent'
+// { given: 'Consent Given', scopeChanged: 'Consent Scope Changed' }
+```
+
+The package sends nothing — each site passes these names to its own tracker,
+with properties `{ brand, scope }`. Every landing page naming events the same
+way is what makes consent measurable across sites later without reconciling
+separate vocabularies.
 
 ## Store it
 
@@ -73,10 +96,18 @@ Keep your constant names if other files import them: re-export the package's
 values under the old names and nothing else in your site has to change. Keep
 your column names too; renaming is optional and never a condition of adopting.
 
-**How to know it worked:** run your existing test suite. The only assertions
-that may change are ones that hard-code a version string. If anything else needs
-editing beyond import paths, the adoption is wrong — that is the signal, not an
-obstacle to work around.
+**How to know it worked:** run your existing test suite. What counts as "worked"
+depends on whether your live text already matches `consentSentences(brand)`:
+
+- If it already matches (this was true for Forsikring's first adoption), the
+  only assertions that may change are ones that hard-code a version string. If
+  anything else needs editing beyond import paths, the adoption is wrong — that
+  is the signal, not an obstacle to work around.
+- If it does not match, your sentence assertions change too, and that is
+  expected: visitors now see the package's wording instead of your old text,
+  and your stored version moves to text they did not see before. That is a
+  wording change worth recording as a decision — in your own change log or PR
+  description — not a regression to hide by editing the test until it passes.
 
 **What stays yours:** the signup route, `db.ts`, the confirmation mail and its
 headings, the consent token, the preference centre, your column names.
@@ -104,12 +135,17 @@ a git tag; check whether Dependabot does before relying on it.
 
 ## Changing consent
 
-Only through a pull request here, approved by Altid Hjem (`CODEOWNERS`). For any
-change to a sentence or the family list:
+Consent changes are to go through Altid Hjem. That is enforced by a `CODEOWNERS`
+file and branch protection on `main` naming Altid Hjem's owners — pending: no
+`CODEOWNERS` file exists yet, because Altid Hjem's owners are not yet named.
+Until it does, this is a rule reviewers uphold by hand, not one the repository
+enforces. For any change to a sentence or the family list:
 
 1. Bump `CONSENT_TEMPLATE_VERSION` in `src/version.ts`.
 2. Record the exact new text in `CHANGELOG.md`.
-3. Record the new fingerprint in `test/version.test.ts` — the failing test prints it.
+3. Add a new entry for it in `test/version.test.ts` — the failing test prints
+   the exact line. Never edit or remove an existing entry; the current version
+   must stay the newest one.
 4. After merge, tag the release (`vX.Y.Z`) so sites can point at it.
 
 Adding a brand to the family is a new consent scope: people who consented under

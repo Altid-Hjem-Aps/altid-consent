@@ -23,12 +23,26 @@ function fingerprint(): string {
 describe('template version', () => {
   it('matches the recorded fingerprint of the current text', () => {
     const actual = fingerprint()
+    const recorded = RECORDED[CONSENT_TEMPLATE_VERSION]
+
+    if (recorded === undefined) {
+      throw new Error(
+        `CONSENT_TEMPLATE_VERSION '${CONSENT_TEMPLATE_VERSION}' is not recorded. ` +
+          `Record the text in CHANGELOG.md, then add this NEW line to RECORDED in test/version.test.ts ` +
+          `(never edit an existing entry): '${CONSENT_TEMPLATE_VERSION}': '${actual}',`,
+      )
+    }
+
     expect(
-      RECORDED[CONSENT_TEMPLATE_VERSION],
-      `The consent text changed without a new version, or the new version is not recorded. ` +
-        `Bump CONSENT_TEMPLATE_VERSION, record the text in CHANGELOG.md, then add ` +
-        `'${CONSENT_TEMPLATE_VERSION}': '${actual}' here.`,
+      recorded,
+      `The consent text changed but CONSENT_TEMPLATE_VERSION did not. Bump CONSENT_TEMPLATE_VERSION in ` +
+        `src/version.ts, record the new text in CHANGELOG.md, then add a NEW entry to RECORDED in ` +
+        `test/version.test.ts for the new version — never edit or overwrite this existing entry.`,
     ).toBe(actual)
+  })
+
+  it('keeps CONSENT_TEMPLATE_VERSION as the newest recorded entry, so the record stays append-only', () => {
+    expect(Object.keys(RECORDED).at(-1)).toBe(CONSENT_TEMPLATE_VERSION)
   })
 
   it('suffixes the brand, so every stored row names its landing page', () => {

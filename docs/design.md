@@ -94,12 +94,17 @@ const [consentState, setConsentState] = useState(INITIAL_CONSENT)
 The brand is the entire configuration. *(Corrected in v1: the site holds the
 state, because it needs it at submit.)*
 
-The component hands the site `{ own: boolean, group: boolean }`. The site's own
-`db.ts` maps that to its columns in two plain lines:
+The component hands the site `{ own: boolean, group: boolean }`. *(Corrected in v1:
+on altidforsikring.dk that mapping sits in the form's request body,
+`components/WaitlistForm.tsx`, not in `db.ts` — the site's API and database
+still call the own-brand flag `mad`.)*
 
 ```ts
-marketing_consent_mad:   consent.own,   // Forsikring's existing column name
-marketing_consent_group: consent.group,
+consent: {
+  version: CONSENT_VERSION,
+  mad:   consentFlags(consentState).own,   // Forsikring's existing column name
+  group: consentFlags(consentState).group,
+},
 ```
 
 The package never touches a database and never knows a column name. A config
@@ -165,9 +170,10 @@ change safe; it does not make it free. Altid Hjem decides when that is worth it.
 
 ### If a site ever renames its columns
 
-Not planned, and not needed: once the package is in, `mad` survives in exactly
-one line of Forsikring's `db.ts`. But if a team does rename later, the README
-says how:
+Not planned, and not needed. *(Corrected in v1: `mad` does not survive in one
+line — with the package in, it remains the own-brand flag throughout
+altidforsikring.dk's API, consent token, confirm page, preference centre and
+`db.ts`.)* But if a team does rename later, the README says how:
 
 - **Never a bare `ALTER TABLE ... RENAME COLUMN`.** The deployed code references
   the old name for as long as the deploy takes, and every write in that window

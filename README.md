@@ -135,10 +135,10 @@ a git tag; check whether Dependabot does before relying on it.
 
 ## Changing consent
 
-Consent changes go through Altid Hjem. `.github/CODEOWNERS` names the owners,
-and branch protection on `main` requires every change to arrive as a pull
-request approved by one of them other than its author. Administrators are held
-to the same rule. For any change to a sentence or the family list:
+Consent changes go through Altid Hjem. `.github/CODEOWNERS` names the owners:
+every change arrives as a pull request approved by one of them other than its
+author. That is a team rule, not one GitHub enforces — branch protection is not
+switched on. For any change to a sentence or the family list:
 
 1. Bump `CONSENT_TEMPLATE_VERSION` in `src/version.ts`.
 2. Record the exact new text in `CHANGELOG.md`.

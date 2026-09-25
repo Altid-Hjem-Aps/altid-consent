@@ -135,11 +135,10 @@ a git tag; check whether Dependabot does before relying on it.
 
 ## Changing consent
 
-Consent changes are to go through Altid Hjem. That is enforced by a `CODEOWNERS`
-file and branch protection on `main` naming Altid Hjem's owners — pending: no
-`CODEOWNERS` file exists yet, because Altid Hjem's owners are not yet named.
-Until it does, this is a rule reviewers uphold by hand, not one the repository
-enforces. For any change to a sentence or the family list:
+Consent changes go through Altid Hjem. `.github/CODEOWNERS` names the owners,
+and branch protection on `main` requires every change to arrive as a pull
+request approved by one of them other than its author. Administrators are held
+to the same rule. For any change to a sentence or the family list:
 
 1. Bump `CONSENT_TEMPLATE_VERSION` in `src/version.ts`.
 2. Record the exact new text in `CHANGELOG.md`.

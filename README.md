@@ -98,8 +98,8 @@ marketing_consent_group: group,
 consent_version:         consentVersion('mad'),
 ```
 
-`own` is your brand. `group` is Altid Hjem and the rest of the family. Pass your
-brand to `consentFlags(state, brand)`.
+`own` is your brand. `group` is Altid Hjem and the rest of the family. `consentFlags(state, brand)`
+takes your brand and requires it.
 
 altidhjem.dk is the exception: it has no brand of its own to consent to, and one
 tick always gives `{ own: true, group: true }`. On its shared waitlist the site

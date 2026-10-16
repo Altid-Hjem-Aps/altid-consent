@@ -53,17 +53,17 @@ describe('ConsentBlock', () => {
     expect(screen.getByRole('checkbox')).toBeChecked()
     fireEvent.click(screen.getByRole('button', { name: F.narrowLink }))
     expect(screen.getByRole('checkbox')).not.toBeChecked()
-    expect(consentFlags(seen[seen.length - 1])).toEqual({ own: false, group: false })
+    expect(consentFlags(seen[seen.length - 1], 'forsikring')).toEqual({ own: false, group: false })
   })
 
   it('reports the flags a site stores', () => {
     const seen: ConsentState[] = []
     render(<Harness brand="forsikring" onState={(s) => seen.push(s)} />)
     fireEvent.click(screen.getByRole('checkbox'))
-    expect(consentFlags(seen[seen.length - 1])).toEqual({ own: true, group: true })
+    expect(consentFlags(seen[seen.length - 1], 'forsikring')).toEqual({ own: true, group: true })
     fireEvent.click(screen.getByRole('button', { name: F.narrowLink }))
     fireEvent.click(screen.getByRole('checkbox'))
-    expect(consentFlags(seen[seen.length - 1])).toEqual({ own: true, group: false })
+    expect(consentFlags(seen[seen.length - 1], 'forsikring')).toEqual({ own: true, group: false })
   })
 
   it('describes the box with the withdraw line', () => {
@@ -164,9 +164,9 @@ describe('ConsentBlock', () => {
       const seen: ConsentState[] = []
       render(<Harness brand="hjem" onState={(s) => seen.push(s)} />)
       fireEvent.click(screen.getByRole('checkbox'))
-      expect(consentFlags(seen[seen.length - 1])).toEqual({ own: true, group: true })
+      expect(consentFlags(seen[seen.length - 1], 'hjem')).toEqual({ own: true, group: true })
       fireEvent.click(screen.getByRole('checkbox'))
-      expect(consentFlags(seen[seen.length - 1])).toEqual({ own: false, group: false })
+      expect(consentFlags(seen[seen.length - 1], 'hjem')).toEqual({ own: false, group: false })
     })
 
     it('opens the senders list', () => {

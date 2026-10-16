@@ -41,7 +41,7 @@ const [consentState, setConsentState] = useState(INITIAL_CONSENT)
 <ConsentBlock brand="mad" value={consentState} onChange={setConsentState} />
 
 // at submit
-const { own, group } = consentFlags(consentState)
+const { own, group } = consentFlags(consentState, 'mad')
 const version = consentVersion('mad')
 ```
 
@@ -98,7 +98,18 @@ marketing_consent_group: group,
 consent_version:         consentVersion('mad'),
 ```
 
-`own` is your brand. `group` is Altid Hjem and the rest of the family. Store
+`own` is your brand. `group` is Altid Hjem and the rest of the family. Pass your
+brand to `consentFlags(state, brand)`.
+
+altidhjem.dk is the exception: it has no brand of its own to consent to, and one
+tick always gives `{ own: true, group: true }`. On its shared waitlist the site
+stores both flags today as `marketing_consent_mad` and `marketing_consent_group`
+(landing-page `components/WaitlistForm.tsx` sends `mad: consentAll, group:
+consentAll`; `lib/db.ts` writes those two columns, the same row altidmad.dk
+reads). So for `hjem`, `own` lands in the existing `mad` column, and ticking the
+Hjem box also sets the Mad brand's own flag. Keep that mapping when adopting;
+whether the Hjem tick should keep setting the Mad flag is a question for Altid
+Hjem, not for the package. Store
 `consentVersion(brand)` with every consent and never write a version by hand: it
 is the template version plus your brand, e.g. `2026-10-16.2-mad`, so every row
 proves which wording was accepted and which landing page it came from.
@@ -157,7 +168,8 @@ a git tag; check whether Dependabot does before relying on it.
 Consent changes go through Altid Hjem. `.github/CODEOWNERS` names the owners,
 and branch protection on `main` requires every change to arrive as a pull
 request approved by one of them other than its author. Administrators are held
-to the same rule. For any change to a sentence or the family list:
+to the same rule. For any change to a sentence, the family list or the senders
+list (`src/senders.ts`):
 
 1. Bump `CONSENT_TEMPLATE_VERSION` in `src/version.ts`.
 2. Record the exact new text in `CHANGELOG.md`.

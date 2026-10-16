@@ -18,4 +18,16 @@ describe('consentFlags', () => {
   it('unticked on the narrow sentence: nothing', () => {
     expect(consentFlags({ checked: false, scope: 'own' })).toEqual({ own: false, group: false })
   })
+
+  it('hjem: one combined box, a tick is always both flags, whatever the scope', () => {
+    expect(consentFlags({ checked: true, scope: 'all' }, 'hjem')).toEqual({ own: true, group: true })
+    expect(consentFlags({ checked: true, scope: 'own' }, 'hjem')).toEqual({ own: true, group: true })
+    expect(consentFlags({ checked: false, scope: 'all' }, 'hjem')).toEqual({ own: false, group: false })
+    expect(consentFlags({ checked: false, scope: 'own' }, 'hjem')).toEqual({ own: false, group: false })
+  })
+
+  it('family brands passed explicitly behave as without the brand', () => {
+    expect(consentFlags({ checked: true, scope: 'own' }, 'mad')).toEqual({ own: true, group: false })
+    expect(consentFlags({ checked: true, scope: 'all' }, 'forsikring')).toEqual({ own: true, group: true })
+  })
 })

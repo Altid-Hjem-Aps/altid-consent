@@ -21,6 +21,20 @@ two near-identical boxes, then a lead plus two labelled boxes — read as a wall
 of terms, and people stopped before the button. Anyone who wants less sees the
 link right under the box.
 
+## Altid Hjem keeps one combined box
+
+altidhjem.dk shows the broad sentence only: one tick stores both flags, and there
+is no "Kun X? Skift her" link. Altid Hjem is the parent, not a family brand, so a
+narrow sentence "about Altid Hjem only" would mean nothing the broad one does not
+already say. Decided by Alexander in landing-page #109.
+
+## Who is behind the brands is one click away
+
+The broad sentence names every brand as a sender, so "Hvem står bag?" shows the
+company and CVR behind each one. The link opens a list and never ticks the box,
+and only sits next to the broad sentence: a narrow sentence names one sender, and
+that sender is the brand the visitor is on.
+
 ## Switching scope clears the tick
 
 A person can only consent to the sentence they are looking at. Without this, a

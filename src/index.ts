@@ -1,5 +1,6 @@
-export { BRAND_NAMES, FAMILY, type Brand } from './brands.js'
-export { consentSentences, type ConsentSentences } from './sentences.js'
+export { BRAND_NAMES, BRAND_TOPICS, FAMILY, isFamilyBrand, type Brand, type FamilyBrand } from './brands.js'
+export { consentSentences, type CombinedSentences, type ConsentSentences } from './sentences.js'
+export { CONSENT_SENDERS } from './senders.js'
 export { CONSENT_TEMPLATE_VERSION, consentVersion } from './version.js'
 export { INITIAL_CONSENT, consentFlags, type ConsentScope, type ConsentState } from './state.js'
 export { CONSENT_EVENTS } from './events.js'

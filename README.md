@@ -109,7 +109,11 @@ consentAll`; `lib/db.ts` writes those two columns, the same row altidmad.dk
 reads). So for `hjem`, `own` lands in the existing `mad` column, and ticking the
 Hjem box also sets the Mad brand's own flag. Keep that mapping when adopting;
 whether the Hjem tick should keep setting the Mad flag is a question for Altid
-Hjem, not for the package. Store
+Hjem, not for the package. altidhjem.dk's preference centre, confirmation mail
+and /bekraeft describe those two flags separately, so from `2026-10-16.2` they
+quote `consentSentences('mad').own` and `.group` (landing-page #110): a
+`-hjem` row with only one flag set accepted the `mad` sentence for that flag in
+CHANGELOG.md. Store
 `consentVersion(brand)` with every consent and never write a version by hand: it
 is the template version plus your brand, e.g. `2026-10-16.2-mad`, so every row
 proves which wording was accepted and which landing page it came from.

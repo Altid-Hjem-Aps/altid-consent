@@ -20,7 +20,7 @@ narrow sentence and no "Kun X? Skift her" link, and ticking it stores both flags
 ## Install
 
 ```bash
-npm install "github:Altid-Hjem-Aps/altid-consent#v1.1.0"
+npm install "github:Altid-Hjem-Aps/altid-consent#v2.0.0"
 ```
 
 Installed by git tag, not from a registry: no tokens, no `.npmrc`. npm builds the

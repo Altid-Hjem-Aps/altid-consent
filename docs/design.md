@@ -241,6 +241,6 @@ is what makes connecting them cheap once that decision is made.
 
 - Who goes in `CODEOWNERS` for Altid Hjem.
 - ~~altidhjem.dk gains the opt-down link on adoption ("Kun Altid Hjem?").~~
-  Resolved in v1.1: Alexander decided in landing-page #109 that altidhjem.dk
+  Resolved in v2.0: Alexander decided in landing-page #109 that altidhjem.dk
   keeps one combined box, so the `hjem` brand has no narrow sentence and no
   opt-down link.

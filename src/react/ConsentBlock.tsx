@@ -1,16 +1,22 @@
 'use client'
 
-import { useId, type CSSProperties } from 'react'
+import { useId, useState, type CSSProperties } from 'react'
 import type { Brand } from '../brands.js'
+import { CONSENT_SENDERS } from '../senders.js'
 import { consentSentences } from '../sentences.js'
 import type { ConsentState } from '../state.js'
 
 export type ConsentColors = { text: string; muted: string; accent: string }
 
 // Defaults are altidforsikring.dk's, so it renders exactly as before adoption.
-// Other sites override what differs — usually just `accent`.
+// Other sites override what differs, e.g. altidmad.dk dark:
+//   colors={{ accent: '#DCD799' }}; light: { accent: '#3E6924' }
+// altidhjem.dk dark: { text: 'rgba(255,255,255,0.62)', muted: 'rgba(255,255,255,0.62)', accent: '#90ff7c' };
+// light: { accent: '#163223' }.
 const LIGHT: ConsentColors = { text: '#6f6a61', muted: '#6f6a61', accent: '#448df5' }
 const DARK: ConsentColors = { text: 'rgba(255,255,255,0.7)', muted: 'rgba(255,255,255,0.6)', accent: '#a7d3f9' }
+
+export type ConsentSpacing = { marginTop: number; marginBottom: number }
 
 export type ConsentBlockProps = {
   brand: Brand
@@ -18,26 +24,45 @@ export type ConsentBlockProps = {
   onChange: (next: ConsentState) => void
   dark?: boolean
   colors?: Partial<ConsentColors>
+  /**
+   * Space around the block, in px. Defaults to 16 above and 12 below. A site
+   * that puts its own text above the box (e.g. a launch notice) wraps both in
+   * its own container and passes `{ marginTop: 0, marginBottom: 0 }`.
+   */
+  spacing?: Partial<ConsentSpacing>
 }
 
 // One active, never pre-ticked, optional box. The broad sentence shows by
-// default; a text link swaps to this brand alone. Switching clears the tick, so
-// a person can only consent to the sentence they are looking at. DECISIONS.md
-// says why each of these is so.
+// default; a text link swaps to this brand alone (not on `hjem`, which keeps one
+// combined box). Switching clears the tick, so a person can only consent to the
+// sentence they are looking at. "Hvem står bag?" opens the list of companies
+// behind the brands the broad sentence names; it only shows next to the broad
+// sentence and never touches the tick. DECISIONS.md says why each of these is so.
 //
 // Inline styles only: Tailwind does not scan node_modules, so utility classes in
 // a package would silently not exist on the sites that install it. The values
-// reproduce the classes altidforsikring.dk used (text-xs, text-[11px],
-// leading-relaxed, gap-1, gap-2.5, mt-4, mb-3, underline-offset-2).
-export function ConsentBlock({ brand, value, onChange, dark = false, colors }: ConsentBlockProps) {
+// reproduce the classes the sites used (text-xs, text-[11px], leading-relaxed,
+// gap-1, gap-2.5, mt-4, mb-3, underline-offset-2, rounded-lg, px-3, py-2).
+export function ConsentBlock({ brand, value, onChange, dark = false, colors, spacing }: ConsentBlockProps) {
   const c = { ...(dark ? DARK : LIGHT), ...colors }
   const s = consentSentences(brand)
+  const narrow = 'own' in s ? s : null
   const boxId = useId()
   const withdrawId = useId()
-  const sentence = value.scope === 'all' ? s.all : s.own
-  const linkLabel = value.scope === 'all' ? s.narrowLink : s.broadLink
+  const sendersId = useId()
+  const [sendersOpen, setSendersOpen] = useState(false)
+  const showingAll = narrow === null || value.scope === 'all'
+  const sentence = narrow !== null && value.scope === 'own' ? narrow.own : s.all
+  const linkLabel = narrow === null ? null : value.scope === 'all' ? narrow.narrowLink : narrow.broadLink
 
-  const wrap: CSSProperties = { display: 'flex', flexDirection: 'column', gap: 4, marginTop: 16, marginBottom: 12, textAlign: 'left' }
+  const wrap: CSSProperties = {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: 4,
+    marginTop: spacing?.marginTop ?? 16,
+    marginBottom: spacing?.marginBottom ?? 12,
+    textAlign: 'left',
+  }
   const row: CSSProperties = { display: 'flex', gap: 10, alignItems: 'flex-start' }
   const box: CSSProperties = { width: 17, height: 17, marginTop: 2, flexShrink: 0, accentColor: c.accent, cursor: 'pointer' }
   const label: CSSProperties = { fontSize: '0.75rem', fontWeight: 400, lineHeight: 1.45, color: c.text, cursor: 'pointer' }
@@ -52,6 +77,25 @@ export function ConsentBlock({ brand, value, onChange, dark = false, colors }: C
     textDecoration: 'underline',
     textUnderlineOffset: 2,
   }
+  const dot = (
+    <span aria-hidden="true" style={{ margin: '0 8px' }}>
+      ·
+    </span>
+  )
+  // The sites' lists sat under Tailwind's reset (no bullets, no margin, no
+  // padding); inline styles have no reset, so each of those is stated.
+  const senders: CSSProperties = {
+    boxSizing: 'border-box',
+    listStyle: 'none',
+    margin: '0 0 0 27px',
+    padding: '8px 12px',
+    fontSize: 11,
+    fontWeight: 400,
+    lineHeight: 1.625,
+    color: c.muted,
+    borderRadius: 8,
+    border: `1px solid ${dark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`,
+  }
 
   return (
     <div style={wrap}>
@@ -65,7 +109,8 @@ export function ConsentBlock({ brand, value, onChange, dark = false, colors }: C
           style={box}
         />
         {/* htmlFor rather than wrapping: keeps the tick target and the reading
-            target the same rectangle without nesting interactive elements. */}
+            target the same rectangle without nesting interactive elements, and
+            keeps the "Hvem står bag?" button out of the label. */}
         <label htmlFor={boxId} style={label}>
           {sentence}
         </label>
@@ -74,15 +119,42 @@ export function ConsentBlock({ brand, value, onChange, dark = false, colors }: C
           not a block of terms. */}
       <p id={withdrawId} style={second}>
         {s.withdraw}
-        <span aria-hidden="true" style={{ margin: '0 8px' }}>·</span>
-        <button
-          type="button"
-          onClick={() => onChange({ checked: false, scope: value.scope === 'all' ? 'own' : 'all' })}
-          style={link}
-        >
-          {linkLabel}
-        </button>
+        {linkLabel !== null && (
+          <>
+            {dot}
+            <button
+              type="button"
+              onClick={() => onChange({ checked: false, scope: value.scope === 'all' ? 'own' : 'all' })}
+              style={link}
+            >
+              {linkLabel}
+            </button>
+          </>
+        )}
+        {/* Only the broad sentence names several senders, so only it gets the
+            list of companies behind them. */}
+        {showingAll && (
+          <>
+            {dot}
+            <button
+              type="button"
+              onClick={() => setSendersOpen((open) => !open)}
+              aria-expanded={sendersOpen}
+              aria-controls={sendersId}
+              style={link}
+            >
+              {s.sendersLink}
+            </button>
+          </>
+        )}
       </p>
+      {showingAll && sendersOpen && (
+        <ul id={sendersId} style={senders}>
+          {CONSENT_SENDERS.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }

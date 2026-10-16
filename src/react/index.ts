@@ -1,1 +1,1 @@
-export { ConsentBlock, type ConsentBlockProps, type ConsentColors } from './ConsentBlock.js'
+export { ConsentBlock, type ConsentBlockProps, type ConsentColors, type ConsentSpacing } from './ConsentBlock.js'

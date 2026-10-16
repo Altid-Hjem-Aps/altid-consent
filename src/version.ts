@@ -1,10 +1,11 @@
 import type { Brand } from './brands.js'
 
-// The version of the consent TEMPLATE: every sentence in sentences.ts and the
-// family list in brands.ts. Changing either changes what people accept, so it
-// moves this. test/version.test.ts refuses a text change that does not, and
-// CHANGELOG.md records the exact text of every version.
-export const CONSENT_TEMPLATE_VERSION = '2026-09-24.1'
+// The version of the consent TEMPLATE: every sentence in sentences.ts, the
+// family list in brands.ts and the senders in senders.ts. Changing any of them
+// changes what people accept, so it moves this. test/version.test.ts refuses a
+// text change that does not, and CHANGELOG.md records the exact text of every
+// version.
+export const CONSENT_TEMPLATE_VERSION = '2026-10-16.2'
 
 /**
  * What a site stores with each consent: the template version plus the brand.

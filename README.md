@@ -6,10 +6,12 @@ A site says which brand it is. The sentences, the family of brands, the rules an
 the version live here. When consent changes, it changes here, and every site
 picks it up with a version bump.
 
-v1 covers the four family brands: `forsikring`, `energi`, `mobil`, `mad`.
-altidhjem.dk cannot adopt v1 yet — Altid Hjem is the parent and sender named in
-every sentence ("fra Altid Hjem"), not a family member, so what its own narrow
-sentence should say is Altid Hjem's decision to make first.
+It covers the four family brands (`forsikring`, `energi`, `mobil`, `mad`) and
+`hjem`, altidhjem.dk. Altid Hjem is the parent and sender named in every
+sentence ("fra Altid Hjem"), not a family member, so `hjem` is not in the family
+list: altidhjem.dk keeps ONE combined box with the broad sentence only, no
+narrow sentence and no "Kun X? Skift her" link, and ticking it stores both flags
+(decided in landing-page #109).
 
 - **Why it works this way:** [DECISIONS.md](DECISIONS.md)
 - **What every version said, word for word:** [CHANGELOG.md](CHANGELOG.md)
@@ -18,7 +20,7 @@ sentence should say is Altid Hjem's decision to make first.
 ## Install
 
 ```bash
-npm install "github:Altid-Hjem-Aps/altid-consent#v1.0.0"
+npm install "github:Altid-Hjem-Aps/altid-consent#v2.0.0"
 ```
 
 Installed by git tag, not from a registry: no tokens, no `.npmrc`. npm builds the
@@ -39,16 +41,33 @@ const [consentState, setConsentState] = useState(INITIAL_CONSENT)
 <ConsentBlock brand="mad" value={consentState} onChange={setConsentState} />
 
 // at submit
-const { own, group } = consentFlags(consentState)
+const { own, group } = consentFlags(consentState, 'mad')
 const version = consentVersion('mad')
 ```
 
-`brand` is one of `forsikring`, `energi`, `mobil`, `mad`. Your form holds the
-state because it needs it at submit. The component's default colours are
+For `hjem` the same two lines apply: one tick gives `{ own: true, group: true }`.
+
+`brand` is one of `forsikring`, `energi`, `mobil`, `mad`, `hjem`. Your form holds
+the state because it needs it at submit. The component's default colours are
 altidforsikring.dk's; `dark` switches to the dark-background colours, and
-`colors={{ accent: '#dcd799' }}` overrides what differs on your site (that one
-is Altid Mad's mint) — other sites override whichever colours differ from
-Forsikring's, not just accent.
+`colors={{ ... }}` overrides whichever of `text`, `muted` and `accent` differ on
+your site. What the live sites pass:
+
+| Site | light | dark |
+| --- | --- | --- |
+| altidforsikring.dk | (defaults) | `dark` |
+| altidmad.dk | `{ accent: '#3E6924' }` | `dark`, `{ accent: '#DCD799' }` |
+| altidhjem.dk | `{ accent: '#163223' }` | `dark`, `{ text: 'rgba(255,255,255,0.62)', muted: 'rgba(255,255,255,0.62)', accent: '#90ff7c' }` |
+
+Next to the broad sentence the block shows "Hvem står bag?", a toggle (with
+`aria-expanded` and `aria-controls`) that opens a small bordered list of the
+companies behind the brands, `CONSENT_SENDERS`. It never touches the tick and
+disappears with the broad sentence when a visitor narrows to one brand.
+
+The block's default spacing is 16px above and 12px below. A site that puts its
+own text above the box (altidmad.dk and altidhjem.dk show a launch notice) wraps
+the notice and the block in its own container, which owns the spacing, and
+passes `spacing={{ marginTop: 0, marginBottom: 0 }}` to the block.
 
 The component uses inline styles only. Tailwind does not scan `node_modules`, so
 utility classes in a package would silently not exist on your site.
@@ -79,9 +98,20 @@ marketing_consent_group: group,
 consent_version:         consentVersion('mad'),
 ```
 
-`own` is your brand. `group` is Altid Hjem and the rest of the family. Store
+`own` is your brand. `group` is Altid Hjem and the rest of the family. `consentFlags(state, brand)`
+takes your brand and requires it.
+
+altidhjem.dk is the exception: it has no brand of its own to consent to, and one
+tick always gives `{ own: true, group: true }`. On its shared waitlist the site
+stores both flags today as `marketing_consent_mad` and `marketing_consent_group`
+(landing-page `components/WaitlistForm.tsx` sends `mad: consentAll, group:
+consentAll`; `lib/db.ts` writes those two columns, the same row altidmad.dk
+reads). So for `hjem`, `own` lands in the existing `mad` column, and ticking the
+Hjem box also sets the Mad brand's own flag. Keep that mapping when adopting;
+whether the Hjem tick should keep setting the Mad flag is a question for Altid
+Hjem, not for the package. Store
 `consentVersion(brand)` with every consent and never write a version by hand: it
-is the template version plus your brand, e.g. `2026-09-24.1-mad`, so every row
+is the template version plus your brand, e.g. `2026-10-16.2-mad`, so every row
 proves which wording was accepted and which landing page it came from.
 
 ## Adopting on an existing site
@@ -138,7 +168,8 @@ a git tag; check whether Dependabot does before relying on it.
 Consent changes go through Altid Hjem. `.github/CODEOWNERS` names the owners,
 and branch protection on `main` requires every change to arrive as a pull
 request approved by one of them other than its author. Administrators are held
-to the same rule. For any change to a sentence or the family list:
+to the same rule. For any change to a sentence, the family list or the senders
+list (`src/senders.ts`):
 
 1. Bump `CONSENT_TEMPLATE_VERSION` in `src/version.ts`.
 2. Record the exact new text in `CHANGELOG.md`.

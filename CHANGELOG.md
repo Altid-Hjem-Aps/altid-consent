@@ -12,6 +12,61 @@ This version covers the package's own sentences only — the ones `consentSenten
 generates. Text a site owns itself, such as its confirmation-mail headings, is not
 versioned here.
 
+## 2026-11-15.1
+
+One change, in the broad sentence: Mad's topic is "mad" instead of "madvarer" (Thor Jekes, 2026-11-15). Every other sentence, the family, the senders list, the withdraw line and the links are as in `2026-10-16.2` below, repeated here in full.
+
+Family, in order: Forsikring, Energi, Mobil, Mad. Sender: Altid Hjem.
+
+Broad sentence (`all`), the same for every brand including `hjem`:
+
+> Ja tak til nyheder og gode tilbud på mail om forsikring, el, mobil og mad fra Altid Hjem, Altid Forsikring, Altid Energi, Altid Mobil og Altid Mad.
+
+Withdraw line: `Afmeld når som helst`. Link back to the broad sentence: `Hele familien igen? Skift her`. Senders link (shown next to the broad sentence only, never ticks the box): `Hvem står bag?`
+
+Senders list, in this order, opened by the senders link:
+
+- Altid Hjem ApS (CVR 45637476): Altid Hjem og Altid Forsikring
+- Altid Mobil ApS (CVR 46169093): Altid Mobil
+- Altid Energi ApS (CVR 44373580): Altid Energi
+- Spari ApS (CVR 44307170): Altid Mad
+
+### forsikring
+
+- own: Ja tak til nyt og gode tilbud på mail om Altid Forsikring fra Altid Hjem.
+- group: Ja tak til nyt og gode tilbud på mail fra Altid Hjem og resten af familien: Energi, Mobil og Mad.
+- narrow link: Kun Forsikring? Skift her
+
+### energi
+
+- own: Ja tak til nyt og gode tilbud på mail om Altid Energi fra Altid Hjem.
+- group: Ja tak til nyt og gode tilbud på mail fra Altid Hjem og resten af familien: Forsikring, Mobil og Mad.
+- narrow link: Kun Energi? Skift her
+
+### mobil
+
+- own: Ja tak til nyt og gode tilbud på mail om Altid Mobil fra Altid Hjem.
+- group: Ja tak til nyt og gode tilbud på mail fra Altid Hjem og resten af familien: Forsikring, Energi og Mad.
+- narrow link: Kun Mobil? Skift her
+
+### mad
+
+- own: Ja tak til nyt og gode tilbud på mail om Altid Mad fra Altid Hjem.
+- group: Ja tak til nyt og gode tilbud på mail fra Altid Hjem og resten af familien: Forsikring, Energi og Mobil.
+- narrow link: Kun Mad? Skift her
+
+### hjem
+
+- Broad sentence, withdraw line and senders link only, as above.
+- No own or group sentence and no narrow link: altidhjem.dk keeps one combined box. Ticking it stores both flags (`own` and `group`).
+- The per-brand sentences in altidhjem.dk's preference centre are not part of this template.
+
+### How stored versions relate to earlier versions
+
+- A row stored as `2026-11-15.1-<brand>` accepted the broad sentence above, with "mad". A row stored as `2026-10-16.2-<brand>` accepted the same text with "madvarer". The own and group sentences are identical under both.
+- The pre-package site versions `2026-10-16.1-af`, `2026-10-16.1-hjem` and `2026-10-16.1-mad` showed the "madvarer" broad sentence; how they relate to `2026-10-16.2` is recorded under that version below.
+- A site moves to this version only when it installs v2.1.0. Until then it keeps showing and storing `2026-10-16.2`.
+
 ## 2026-10-16.2
 
 Second template. Three changes, all of them in what a visitor reads:

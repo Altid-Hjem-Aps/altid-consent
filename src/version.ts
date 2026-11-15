@@ -5,7 +5,7 @@ import type { Brand } from './brands.js'
 // changes what people accept, so it moves this. test/version.test.ts refuses a
 // text change that does not, and CHANGELOG.md records the exact text of every
 // version.
-export const CONSENT_TEMPLATE_VERSION = '2026-10-16.2'
+export const CONSENT_TEMPLATE_VERSION = '2026-11-15.1'
 
 /**
  * What a site stores with each consent: the template version plus the brand.

@@ -24,7 +24,7 @@ export const BRAND_TOPICS: Record<FamilyBrand, string> = {
   forsikring: 'forsikring',
   energi: 'el',
   mobil: 'mobil',
-  mad: 'madvarer',
+  mad: 'mad',
 }
 
 export function isFamilyBrand(brand: Brand): brand is FamilyBrand {

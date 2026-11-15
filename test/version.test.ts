@@ -20,6 +20,7 @@ import { CONSENT_TEMPLATE_VERSION, consentVersion } from '../src/version.js'
 const RECORDED: Record<string, string> = {
   '2026-09-24.1': 'dc1e8d91465fd571ae7d219741af411e70eb177b0d3514724556ac89770a871a',
   '2026-10-16.2': '008eaa93202538e1796764e14b0a3e67dcfae38a2829a15436d309eea22a0b90',
+  '2026-11-15.1': '12cd462feb35e2d817d4c0909f27efd6603afcef26e6b729bfa0322cf37c394a',
 }
 
 function fingerprint(): string {
